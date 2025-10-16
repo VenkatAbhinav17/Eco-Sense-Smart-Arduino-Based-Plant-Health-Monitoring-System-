@@ -1,0 +1,46 @@
+#define SOIL_PIN A0
+#define LDR_PIN A1
+#define TEMP_PIN A2
+#define BUZZER_PIN 8
+
+#define SOIL_THRESHOLD 500
+#define TEMP_LOW 15
+#define TEMP_HIGH 30
+#define LIGHT_THRESHOLD 300
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(BUZZER_PIN, OUTPUT);
+}
+
+void loop() {
+  // Soil Moisture
+  int soilValue = analogRead(SOIL_PIN);
+
+  // Light Level
+  int ldrValue = analogRead(LDR_PIN);
+
+  // Temperature (TMP36)
+  int tempValue = analogRead(TEMP_PIN);
+  // Convert analog value to voltage
+  float voltage = tempValue * (5.0 / 1023.0);
+  // Convert voltage to temperature in °C (TMP36 formula)
+  float temperature = (voltage - 0.5) * 100.0;
+
+  // Display data on Serial Monitor
+  Serial.print("Soil: "); Serial.print(soilValue);
+  Serial.print(" | Temp: "); Serial.print(temperature);
+  Serial.print("C | Light: "); Serial.println(ldrValue);
+
+  // Alert logic
+  bool soilDry = soilValue > SOIL_THRESHOLD;
+  bool tempOutOfRange = (temperature < TEMP_LOW || temperature > TEMP_HIGH);
+
+  if (soilDry || tempOutOfRange) {
+    digitalWrite(BUZZER_PIN, HIGH);
+  } else {
+    digitalWrite(BUZZER_PIN, LOW);
+  }
+
+  delay(2000); // Update every 2 seconds
+}
